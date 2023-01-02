@@ -7,7 +7,7 @@ public class Pellet : MonoBehaviour
 
     protected virtual void Eat()
     {
-        FindObjectOfType<GameManager>().PelletEaten(this);
+        this.transform.parent.parent.parent.transform.Find("GameManager").GetComponent<GameManager>().PelletEaten(this);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

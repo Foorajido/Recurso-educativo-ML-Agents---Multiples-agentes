@@ -10,6 +10,8 @@ public class Passage : MonoBehaviour
         Vector3 position = connection.position;
         position.z = other.transform.position.z;
         other.transform.position = position;
+        //Grid Movement
+        other.transform.GetComponent<Movement>().movePoint.position = position;
     }
 
 }

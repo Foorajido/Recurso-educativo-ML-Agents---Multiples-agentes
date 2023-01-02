@@ -79,15 +79,15 @@ public class GameManager : MonoBehaviour
 
     public void PacmanEaten()
     {
-        pacman.DeathSequence();
+        // pacman.DeathSequence();
 
-        SetLives(lives - 1);
+        // SetLives(lives - 1);
 
-        if (lives > 0) {
-            Invoke(nameof(ResetState), 3f);
-        } else {
-            GameOver();
-        }
+        // if (lives > 0) {
+        //     Invoke(nameof(ResetState), 3f);
+        // } else {
+        //     GameOver();
+        // }
     }
 
     public void GhostEaten(Ghost ghost)
@@ -106,8 +106,7 @@ public class GameManager : MonoBehaviour
 
         if (!HasRemainingPellets())
         {
-            pacman.gameObject.SetActive(false);
-            Invoke(nameof(NewRound), 3f);
+            pacman.mazeCompleted();
         }
     }
 
@@ -137,6 +136,11 @@ public class GameManager : MonoBehaviour
     private void ResetGhostMultiplier()
     {
         ghostMultiplier = 1;
+    }
+
+    public void resetEpisode()
+    {
+        NewGame();
     }
 
 }

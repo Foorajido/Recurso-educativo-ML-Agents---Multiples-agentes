@@ -46,9 +46,10 @@ public class Ghost : MonoBehaviour
 
     public void SetPosition(Vector3 position)
     {
-        // Keep the z-position the same since it determines draw depth
+        // Mantiene la posición en Z ya que es la misma que determina la profundidad del objeto.
         position.z = transform.position.z;
         transform.position = position;
+        movement.movePoint.position = position;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -56,9 +57,9 @@ public class Ghost : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Pacman"))
         {
             if (frightened.enabled) {
-                FindObjectOfType<GameManager>().GhostEaten(this);
+                this.transform.parent.transform.Find("GameManager").GetComponent<GameManager>().GhostEaten(this); 
             } else {
-                FindObjectOfType<GameManager>().PacmanEaten();
+                this.transform.parent.transform.Find("GameManager").GetComponent<GameManager>().PacmanEaten(); 
             }
         }
     }

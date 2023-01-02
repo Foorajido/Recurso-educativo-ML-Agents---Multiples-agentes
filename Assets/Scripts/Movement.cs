@@ -13,10 +13,14 @@ public class Movement : MonoBehaviour
     public Vector2 nextDirection { get; private set; }
     public Vector3 startingPosition { get; private set; }
 
+    public Transform movePoint; //Esta posición se asigna desde el inspector y corresponde al punto donde debe moverse la entidad.
+    
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody2D>();
         startingPosition = transform.position;
+
+        movePoint.parent = null; //Se remueve el padre del objeto para que no dependa del transform del padre y pueda moverse libremente.
     }
 
     private void Start()
@@ -32,12 +36,14 @@ public class Movement : MonoBehaviour
         transform.position = startingPosition;
         rigidbody.isKinematic = false;
         enabled = true;
+
+        movePoint.position = startingPosition; //Al reiniciarse la posicion de movePoint también debe volver a la posición inicial.
     }
 
     private void Update()
     {
-        // Try to move in the next direction while it's queued to make movements
-        // more responsive
+        // Intenta moverse hacia la siguiente dirección mientras se encuentre en la cola
+        // para hacer el movimiento más responsivo.
         if (nextDirection != Vector2.zero) {
             SetDirection(nextDirection);
         }
@@ -45,17 +51,37 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 position = rigidbody.position;
-        Vector2 translation = direction * speed * speedMultiplier * Time.fixedDeltaTime;
 
-        rigidbody.MovePosition(position + translation);
+        if(Vector3.Distance(transform.position, movePoint.position) <= .05f && !Occupied(direction))
+        {
+            if(direction.x == -1)
+            {
+                movePoint.position += new Vector3(-1f, 0f, 0f);
+            }
+            else if(direction.x == 1)
+            {
+                movePoint.position += new Vector3(1f, 0f, 0f);
+            }
+            else if(direction.y == -1)
+            {
+                movePoint.position += new Vector3(0f, -1f, 0f);
+            }
+            else if(direction.y == 1)
+            {
+                movePoint.position += new Vector3(0f, 1f, 0f);
+            }
+                
+        }
+        
+        transform.position = Vector3.MoveTowards(transform.position, movePoint.position, speed * Time.deltaTime); //Esto mueve a la entidad HACIA movePoint en un determinado tiempo
+        
     }
 
     public void SetDirection(Vector2 direction, bool forced = false)
     {
-        // Only set the direction if the tile in that direction is available
-        // otherwise we set it as the next direction so it'll automatically be
-        // set when it does become available
+        // Sólo establece la dirección si el tile en esa dirección se encuentra disponible
+        // si no es el caso se establece como la siguiente dirección de manera que se establezca
+        // automáticamente cuando se encuentre disponible.
         if (forced || !Occupied(direction))
         {
             this.direction = direction;
@@ -69,8 +95,8 @@ public class Movement : MonoBehaviour
 
     public bool Occupied(Vector2 direction)
     {
-        // If no collider is hit then there is no obstacle in that direction
-        RaycastHit2D hit = Physics2D.BoxCast(transform.position, Vector2.one * 0.75f, 0f, direction, 1.5f, obstacleLayer);
+        // Si no se encuentra ningún collider significa que no hay ningún obstáculo en esa dirección.
+        RaycastHit2D hit = Physics2D.BoxCast(transform.position, Vector2.one * 0.75f, 0f, direction, 1f, obstacleLayer);
         return hit.collider != null;
     }
 
